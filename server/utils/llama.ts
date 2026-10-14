@@ -1,5 +1,5 @@
 import { pipeline, env, type FeatureExtractionPipeline } from '@huggingface/transformers'
-import { insertVectors, searchVectors, type VectorRecord } from './database/lance'
+import { hasSearchableVectors, insertVectors, searchVectors, type VectorRecord } from './database/lance'
 import { chunkText, type ExtractedTags, type GroupFile } from './extract'
 import { join } from 'path'
 import { getConfig } from './config'
@@ -74,6 +74,7 @@ function rerank(results: VectorRecord[], queryTags: Record<string, string>): Sea
 export async function searchSimilar(query: string, limit?: number, filter?: Record<string, string>): Promise<SearchResult[]> {
   const config = getConfig()
   const searchLimit = limit ?? config.searchLimit
+  if (!await hasSearchableVectors()) return []
   const candidates = await searchVectors(await embedText(query),  config.searchCandidate,  filter && Object.keys(filter).length > 0 ? filter : undefined)
   return rerank(candidates, filter || {}).slice(0, searchLimit)
 }

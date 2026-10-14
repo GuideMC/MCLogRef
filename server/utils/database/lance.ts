@@ -62,6 +62,11 @@ export async function getCount(): Promise<number> {
   return await (await getTable()).countRows()
 }
 
+export async function hasSearchableVectors(): Promise<boolean> {
+  const rows = await (await getTable()).query().where('rid > 0').limit(1).toArray()
+  return rows.length > 0
+}
+
 export async function closeLanceConnection(): Promise<void> {
   table = null
   connection = null

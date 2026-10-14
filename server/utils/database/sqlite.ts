@@ -95,8 +95,44 @@ export function getReportByName(name: string): Report | undefined {
   return getDatabase().prepare('SELECT * FROM reports WHERE name = ?').get(name) as Report | undefined
 }
 
-export function getReports(limit: number = 100, offset: number = 0): Report[] {
-  return getDatabase().prepare('SELECT * FROM reports ORDER BY timestamp DESC LIMIT ? OFFSET ?').all(limit, offset) as Report[]
+export interface ReportFilters {
+  q?: string
+  error?: string
+  version?: string
+  loader?: string
+  status?: number
+  from?: string
+  to?: string
+}
+
+export function getReports(limit: number = 100, offset: number = 0, filters: ReportFilters = {}): Report[] {
+  const conditions: string[] = []
+  const values: Array<string | number> = []
+  if (filters.q) {
+    conditions.push('name LIKE ? ESCAPE \'!\'')
+    values.push(`%${filters.q.replace(/[!%_]/g, '!$&')}%`)
+  }
+  for (const type of ['error', 'version', 'loader'] as const) {
+    const value = filters[type]
+    if (value) {
+      conditions.push('EXISTS (SELECT 1 FROM tags WHERE tags.rid = reports.id AND tags.type = ? AND tags.value LIKE ? ESCAPE \'!\')')
+      values.push(type, `%${value.replace(/[!%_]/g, '!$&')}%`)
+    }
+  }
+  if (filters.status !== undefined) {
+    conditions.push('status = ?')
+    values.push(filters.status)
+  }
+  if (filters.from) {
+    conditions.push('timestamp >= ?')
+    values.push(Math.floor(new Date(filters.from).getTime() / 1000))
+  }
+  if (filters.to) {
+    conditions.push('timestamp < ?')
+    values.push(Math.floor(new Date(filters.to).getTime() / 1000) + 86400)
+  }
+  const where = conditions.length ? `WHERE ${conditions.join(' AND ')}` : ''
+  return getDatabase().prepare(`SELECT * FROM reports ${where} ORDER BY timestamp DESC, id DESC LIMIT ? OFFSET ?`).all(...values, limit, offset) as Report[]
 }
 
 export function updateReport(id: number, data: Partial<Pick<Report, 'name' | 'solution' | 'status'>>): void {

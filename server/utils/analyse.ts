@@ -84,10 +84,15 @@ export async function buildContext(rid: number): Promise<AnalysisContext> {
     const tag = tags.find(item => item.type === type)
     if (tag) filter[type] = tag.value
   }
-  const similarCases = (await searchSimilar(mainContent, searchLimit, filter)).flatMap((result) => {
-    const historyReport = getReport(result.rid)
-    return historyReport?.solution ? [{ rid: result.rid, text: result.text, meta: result.meta, solution: historyReport.solution }] : []
-  })
+  let similarCases: SimilarCase[] = []
+  try {
+    similarCases = (await searchSimilar(mainContent, searchLimit, filter)).flatMap((result) => {
+      const historyReport = getReport(result.rid)
+      return historyReport?.solution ? [{ rid: result.rid, text: result.text, meta: result.meta, solution: historyReport.solution }] : []
+    })
+  } catch (error) {
+    console.warn('[Analyse] 相似案例检索失败：', error)
+  }
   return { report, files, tags, similarCases, mainContent }
 }
 

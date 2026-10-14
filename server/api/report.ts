@@ -35,7 +35,11 @@ export default defineEventHandler(async (event) => {
       for (const tag of tags.error) createTag(rid, 'error', tag)
       for (const tag of tags.mod) createTag(rid, 'mod', tag)
       for (const reportFile of files) createFile(rid, reportFile.name, reportFile.type, reportFile.content)
-      await vectorizeFiles(rid, files, tags)
+      try {
+        await vectorizeFiles(rid, files, tags)
+      } catch (error) {
+        console.warn('[Report] Vectorizing Files Failed:', error)
+      }
       renameSync(tempPath, join(userDir, filename))
       updateReport(rid, { status: 2 })
     } catch (error) {

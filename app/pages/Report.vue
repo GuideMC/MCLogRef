@@ -32,6 +32,30 @@
         </Button>
       </div>
     </div>
+    <div class="flex items-center gap-2">
+      <input v-model="filters.q" type="search" placeholder="搜索报告名称" class="flex-1 min-w-0 px-3 py-2 text-sm rounded-lg border border-slate-200 bg-white focus:outline-none focus:ring-2 focus:ring-cyan-500" @keyup.enter="applyFilters">
+      <input v-model="filters.error" type="search" placeholder="错误标签" class="flex-1 min-w-0 px-3 py-2 text-sm rounded-lg border border-slate-200 bg-white focus:outline-none focus:ring-2 focus:ring-cyan-500" @keyup.enter="applyFilters">
+      <input v-model="filters.version" type="search" placeholder="游戏版本" class="flex-1 min-w-0 px-3 py-2 text-sm rounded-lg border border-slate-200 bg-white focus:outline-none focus:ring-2 focus:ring-cyan-500" @keyup.enter="applyFilters">
+      <input v-model="filters.loader" type="search" placeholder="加载器" class="flex-1 min-w-0 px-3 py-2 text-sm rounded-lg border border-slate-200 bg-white focus:outline-none focus:ring-2 focus:ring-cyan-500" @keyup.enter="applyFilters">
+      <input v-model="filters.from" type="date" aria-label="开始日期" class="w-36 shrink-0 px-3 py-2 text-sm rounded-lg border border-slate-200 bg-white focus:outline-none focus:ring-2 focus:ring-cyan-500">
+      <input v-model="filters.to" type="date" aria-label="结束日期" class="w-36 shrink-0 px-3 py-2 text-sm rounded-lg border border-slate-200 bg-white focus:outline-none focus:ring-2 focus:ring-cyan-500">
+      <select v-model="filters.status" class="w-28 shrink-0 px-3 py-2 text-sm rounded-lg border border-slate-200 bg-white focus:outline-none focus:ring-2 focus:ring-cyan-500">
+        <option value="">所有状态</option>
+        <option value="0">处理中</option>
+        <option value="1">已完成</option>
+        <option value="2">已上传</option>
+      </select>
+      <Button title="搜索" variant="primary" size="icon" @click="applyFilters">
+        <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+          <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M21 21l-5.197-5.197m0 0A7.5 7.5 0 105.196 5.196a7.5 7.5 0 0010.607 10.607z" />
+        </svg>
+      </Button>
+      <Button title="清空" variant="secondary" size="icon" @click="clearFilters">
+        <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+          <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12" />
+        </svg>
+      </Button>
+    </div>
     <Card class="flex flex-col flex-1 min-h-0 overflow-hidden">
       <div class="flex-1 overflow-y-auto">
         <table class="w-full text-sm">
@@ -68,6 +92,9 @@
               <td class="px-3 py-3 text-center w-12" @click.stop>
                 <input type="checkbox" class="w-4 h-4 rounded border-slate-300 text-cyan-600 focus:ring-cyan-500 cursor-pointer" :checked="selectedIds.has(report.id)" @change="selectedIds.has(report.id) ? selectedIds.delete(report.id) : selectedIds.add(report.id)">
               </td>
+            </tr>
+            <tr v-if="reports.length === 0">
+              <td colspan="5" class="px-3 py-10 text-center text-slate-500">没有匹配的报告</td>
             </tr>
           </tbody>
         </table>
@@ -195,6 +222,7 @@ interface ImportStats {
 }
 
 const currentPage = ref(1)
+const filters = reactive({ q: '', error: '', version: '', loader: '', from: '', to: '', status: '' })
 const reports = ref<Report[]>([])
 const selectedReport = ref<Report | null>(null)
 const reportDetail = ref<ReportDetail | null>(null)
@@ -256,10 +284,25 @@ async function deleteSelected() {
   }
 }
 
+function applyFilters() {
+  currentPage.value = 1
+  loadReports()
+}
+
+function clearFilters() {
+  Object.assign(filters, { q: '', error: '', version: '', loader: '', from: '', to: '', status: '' })
+  applyFilters()
+}
+
 async function loadReports() {
   const page = currentPage.value
   try {
-    const response = await fetch(`/api/reports/list?${new URLSearchParams({ page: String(page), pageSize: '100' })}`)
+    const params = new URLSearchParams({ page: String(page), pageSize: '100' })
+    for (const key of ['q', 'error', 'version', 'loader', 'from', 'to', 'status'] as const) {
+      const value = filters[key].trim()
+      if (value) params.set(key, value)
+    }
+    const response = await fetch(`/api/reports/list?${params}`)
     if (!response.ok) throw new Error(`Load Reports Failed: HTTP ${response.status} ${response.statusText}`)
     const result = await response.json()
     if (result.status !== 200 || !Array.isArray(result.data)) throw new Error(`Load Reports Failed: ${result.data?.message || `Status ${result.status}`}`)

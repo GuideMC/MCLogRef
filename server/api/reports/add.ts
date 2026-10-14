@@ -11,7 +11,10 @@ let importing = false
 export default defineEventHandler(async (event) => {
   if (event.method === 'GET') return { status: 200, data: { importing } }
   if (getCookie(event, 'auth_token') !== 'verified') return { status: 401, data: { message: 'Unauthorized' } }
-  const body = await readBody<{ action?: 'start' | 'cancel' }>(event).catch(() => ({ action: 'start' as const }))
+  const body = await readBody<{ action?: 'start' | 'cancel' }>(event).catch(() => null)
+  if (!body || (body.action !== undefined && body.action !== 'start' && body.action !== 'cancel')) {
+    return { status: 400, data: { message: 'Validating Request Body' } }
+  }
   if (body.action === 'cancel') {
     importing = false
     return { status: 200, data: { message: 'Cancelling Import Process' } }
@@ -90,7 +93,11 @@ export default defineEventHandler(async (event) => {
               for (const tag of tags.mod) createTag(reportId, 'mod', tag)
               for (const file of fileGroup.files) createFile(reportId, file.name, file.type, file.content)
               if (fileGroup.solution) updateReport(reportId, { solution: fileGroup.solution.solution })
-              await vectorizeFiles(reportId, fileGroup.files, tags)
+              try {
+                await vectorizeFiles(reportId, fileGroup.files, tags)
+              } catch (error) {
+                console.warn('[Add] Vectorizing Files Failed:', error)
+              }
               for (const filePath of item.filePaths) {
                 const sourcePath = join(scanPath, filePath)
                 const destPath = join(adminDir, filePath)
