@@ -37,12 +37,18 @@
           </Card>
           <Card class="shrink-0">
             <div class="p-6">
-              <h3 class="text-lg font-bold text-slate-800 flex items-center gap-2 mb-4">
-                <svg class="w-6 h-6 text-cyan-600" fill="currentColor" viewBox="0 0 24 24">
-                  <path d="M10.325 4.317c.426-1.756 2.924-1.756 3.35 0a1.724 1.724 0 002.573 1.066c1.543-.94 3.31.826 2.37 2.37a1.724 1.724 0 001.065 2.572c1.756.426 1.756 2.924 0 3.35a1.724 1.724 0 00-1.066 2.573c.94 1.543-.826 3.31-2.37 2.37a1.724 1.724 0 00-2.572 1.065c-.426 1.756-2.924 1.756-3.35 0a1.724 1.724 0 00-2.573-1.066c-1.543.94-3.31-.826-2.37-2.37a1.724 1.724 0 00-1.065-2.572c-1.756-.426-1.756-2.924 0-3.35a1.724 1.724 0 001.066-2.573c-.94-1.543.826-3.31 2.37-2.37.996.608 2.296.07 2.572-1.065z"/>
-                  <path d="M15 12a3 3 0 11-6 0 3 3 0 016 0z"/>
-                </svg>模型配置
-              </h3>
+              <div class="flex items-center justify-between mb-4">
+                <h3 class="text-lg font-bold text-slate-800 flex items-center gap-2">
+                  <svg class="w-6 h-6 text-cyan-600" fill="currentColor" viewBox="0 0 24 24">
+                    <path d="M10.325 4.317c.426-1.756 2.924-1.756 3.35 0a1.724 1.724 0 002.573 1.066c1.543-.94 3.31.826 2.37 2.37a1.724 1.724 0 001.065 2.572c1.756.426 1.756 2.924 0 3.35a1.724 1.724 0 00-1.066 2.573c.94 1.543-.826 3.31-2.37 2.37a1.724 1.724 0 00-2.572 1.065c-.426 1.756-2.924 1.756-3.35 0a1.724 1.724 0 00-2.573-1.066c-1.543.94-3.31-.826-2.37-2.37a1.724 1.724 0 00-1.065-2.572c-1.756-.426-1.756-2.924 0-3.35a1.724 1.724 0 001.066-2.573c-.94-1.543.826-3.31 2.37-2.37.996.608 2.296.07 2.572-1.065z"/>
+                    <path d="M15 12a3 3 0 11-6 0 3 3 0 016 0z"/>
+                  </svg>模型配置
+                </h3>
+                <label class="flex items-center gap-2 cursor-pointer">
+                  <span class="text-xs font-medium text-slate-500">工具调用</span>
+                  <Check v-model="toolMode" size="sm" />
+                </label>
+              </div>
               <div class="flex flex-col gap-3">
                 <Input v-model="customApi.url" label="API URL" size="sm" />
                 <Input v-model="customApi.key" type="password" label="API Key" size="sm" />
@@ -127,7 +133,7 @@
                 </span>
               </div>
               <div class="flex-1 overflow-y-auto mt-4 pr-2 min-h-0">
-                <MDC :value="result || ''" tag="div" class="max-w-none text-slate-700 text-sm leading-[1.5] [&_h1]:text-cyan-600 [&_h1]:font-semibold [&_h1]:leading-[1.3] [&_h1]:mb-2 [&_h1]:text-lg [&_h1]:mt-0 [&_h2]:text-cyan-700 [&_h2]:font-semibold [&_h2]:leading-[1.3] [&_h2]:mb-2 [&_h2]:text-base [&_h2]:mt-4 [&_h3]:text-cyan-800 [&_h3]:font-semibold [&_h3]:leading-[1.3] [&_h3]:mb-2 [&_h3]:text-[0.9375rem] [&_h3]:mt-3 [&_h4]:text-cyan-900 [&_h4]:font-semibold [&_h4]:leading-[1.3] [&_h4]:mb-2 [&_h4]:text-sm [&_h4]:mt-[0.625rem] [&_p]:m-0 [&_p]:mb-2 [&_strong]:text-slate-900 [&_strong]:font-semibold [&_code]:text-cyan-600 [&_code]:bg-cyan-50 [&_code]:px-1 [&_code]:py-0.5 [&_code]:rounded [&_code]:text-[0.875em] [&_code]:font-[Consolas,Monaco,monospace] [&_ul]:my-2 [&_ul]:pl-5 [&_ol]:my-2 [&_ol]:pl-5 [&_li]:my-1 [&>:first-child]:mt-0 [&>:last-child]:mb-0" />
+                <MDC :value="result || ''" tag="div" class="max-w-none text-slate-700 text-sm leading-[1.5] [&_h1]:text-cyan-600 [&_h1]:font-semibold [&_h1]:leading-[1.3] [&_h1]:mb-2 [&_h1]:text-lg [&_h1]:mt-0 [&_h2]:text-cyan-700 [&_h2]:font-semibold [&_h2]:leading-[1.3] [&_h2]:mb-2 [&_h2]:text-base [&_h2]:mt-4 [&_h3]:text-cyan-800 [&_h3]:font-semibold [&_h3]:leading-[1.3] [&_h3]:mb-2 [&_h3]:text-[0.9375rem] [&_h3]:mt-3 [&_h4]:text-cyan-900 [&_h4]:font-semibold [&_h4]:leading-[1.3] [&_h4]:mb-2 [&_h4]:text-sm [&_h4]:mt-[0.625rem] [&_p]:m-0 [&_p]:mb-2 [&_strong]:text-slate-900 [&_strong]:font-semibold [&_code]:text-cyan-600 [&_code]:bg-cyan-50 [&_code]:px-1 [&_code]:py-0.5 [&_code]:rounded [&_code]:text-[0.875em] [&_code]:font-[Consolas,Monaco,monospace] [&_ul]:my-2 [&_ul]:pl-5 [&_ol]:my-2 [&_ol]:pl-5 [&_li]:my-1 [&_blockquote]:border-l-2 [&_blockquote]:border-cyan-200 [&_blockquote]:bg-cyan-50/50 [&_blockquote]:px-3 [&_blockquote]:py-1.5 [&_blockquote]:my-2 [&_blockquote]:rounded-r-lg [&_blockquote]:text-xs [&_blockquote]:text-slate-500 [&_blockquote_p]:m-0 [&>:first-child]:mt-0 [&>:last-child]:mb-0" />
               </div>
             </div>
           </Card>
@@ -142,7 +148,7 @@ const steps = [
   { title: '解析与提取', desc: '上传日志后，自动提取模组列表、报错堆栈等元数据。', color: 'bg-cyan-50 text-cyan-600 border-cyan-100' },
   { title: '日志向量化', desc: '将提取的报错特征转化为高维向量,存入本地向量数据库。', color: 'bg-teal-50 text-teal-600 border-teal-100' },
   { title: '相似度匹配', desc: '基于语义相似度，从历史案例与知识库中召回相关上下文。', color: 'bg-emerald-50 text-emerald-600 border-emerald-100' },
-  { title: '大模型分析', desc: '将日志与上下文融合构造提示词，调用 LLM 生成解决方案。', color: 'bg-indigo-50 text-indigo-600 border-indigo-100' },
+  { title: 'Agent 分析', desc: '大模型自主检索、联网搜索、查阅源码，生成解决方案。', color: 'bg-indigo-50 text-indigo-600 border-indigo-100' },
 ]
 
 const socialLinks = [
@@ -156,6 +162,7 @@ const rid = ref<number>()
 const status = ref<'idle' | 'uploading' | 'analyzing' | 'error' | 'done'>('idle')
 const result = ref('')
 const customApi = ref({ url: '', key: '', model: '' })
+const toolMode = ref(true)
 
 const badge = computed(() => {
   if (status.value === 'error') return { text: '分析出错', class: 'text-rose-600 bg-rose-50', icon: 'error', loading: false }
@@ -187,7 +194,7 @@ const start = async () => {
     rid.value = uploadData.data.id
     status.value = 'analyzing'
     result.value = ''
-    const requestBody: { rid: number; apiUrl?: string; apiKey?: string; apiModel?: string } = { rid: rid.value! }
+    const requestBody: { rid: number; tools: boolean; apiUrl?: string; apiKey?: string; apiModel?: string } = { rid: rid.value!, tools: toolMode.value }
     if (customApi.value.url) requestBody.apiUrl = customApi.value.url
     if (customApi.value.key) requestBody.apiKey = customApi.value.key
     if (customApi.value.model) requestBody.apiModel = customApi.value.model
@@ -215,6 +222,7 @@ const start = async () => {
         const { status: code, data } = event
         if (code >= 400) throw new Error(`Analysis Failed: ${data?.message || `Status ${code}`}`)
         if (code !== 200 || !data) continue
+        if (data.type === 'tool_call') result.value += `> 🔧 ${data.name}\n\n`
         if (typeof data.content === 'string') result.value += data.content
         if (data.done) { status.value = 'done'; return }
       }
