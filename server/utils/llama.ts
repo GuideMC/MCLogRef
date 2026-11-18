@@ -7,6 +7,7 @@ import { setGlobalDispatcher, ProxyAgent } from 'undici'
 
 const MODEL_NAME = 'Xenova/bge-base-en-v1.5'
 env.cacheDir = join(getConfig('dataDir'), 'models')
+if (process.env.EMBEDDING_HOST) env.remoteHost = process.env.EMBEDDING_HOST
 let embeddingModel: FeatureExtractionPipeline | null = null
 if (process.env.PROXY_URL) setGlobalDispatcher(new ProxyAgent(process.env.PROXY_URL))
 
@@ -16,20 +17,29 @@ export async function loadEmbeddingModel(): Promise<FeatureExtractionPipeline> {
   return embeddingModel
 }
 
+let inferenceQueue: Promise<unknown> = Promise.resolve()
+
+function serialize<T>(task: () => Promise<T>): Promise<T> {
+  const run = inferenceQueue.then(task)
+  inferenceQueue = run.catch(() => undefined)
+  return run
+}
+
 export async function embedText(text: string): Promise<number[]> {
-  const model = await loadEmbeddingModel()
-  const output = await model(text, { pooling: 'cls', normalize: true })
-  return Array.from(output.data as Float32Array)
+  const [vector] = await embedBatch([text])
+  return vector ?? []
 }
 
 export async function embedBatch(texts: string[]): Promise<number[][]> {
-  const model = await loadEmbeddingModel()
-  const vectors: number[][] = []
-  for (const text of texts) {
-    const output = await model(text, { pooling: 'cls', normalize: true })
-    vectors.push(Array.from(output.data as Float32Array))
-  }
-  return vectors
+  return await serialize(async () => {
+    const model = await loadEmbeddingModel()
+    const vectors: number[][] = []
+    for (const text of texts) {
+      const output = await model(text, { pooling: 'cls', normalize: true })
+      vectors.push(Array.from(output.data as Float32Array))
+    }
+    return vectors
+  })
 }
 
 export async function vectorizeFiles(rid: number, files: GroupFile[], tags: ExtractedTags): Promise<number> {

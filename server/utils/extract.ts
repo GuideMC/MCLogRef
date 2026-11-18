@@ -65,6 +65,7 @@ export function extractGroupKey(filepath: string): string {
   const base = basename(filepath)
   if (base.endsWith('.solution.json')) return base.slice(0, -14)
   if (base.endsWith('.json')) return base.slice(0, -5)
+  if (base.toLowerCase().endsWith('.md')) return base.slice(0, -3)
   return base
 }
 

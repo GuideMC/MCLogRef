@@ -42,7 +42,8 @@ export default defineEventHandler(async (event) => {
           }
           try {
             const fileGroup = await readFileGroup(item.filePaths, scanPath)
-            validations.push({ name: item.name, valid: !!fileGroup.solution?.has_solution, filePaths: item.filePaths })
+            const isMarkdown = item.filePaths.some((filepath: string) => filepath.toLowerCase().endsWith('.md'))
+            validations.push({ name: item.name, valid: isMarkdown || !!fileGroup.solution?.has_solution, filePaths: item.filePaths })
           } catch (error) {
             console.error('[Add] Validating Project Failed:', error)
             validations.push({ name: item.name, valid: false, filePaths: item.filePaths })
