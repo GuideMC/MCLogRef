@@ -49,7 +49,7 @@ export function fetchTimeout(url: string, init: RequestInit = {}): Promise<Respo
   return fetch(url, { ...init, signal: AbortSignal.timeout(30000) })
 }
 export const USER_AGENT = 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/120.0.0.0 Safari/537.36'
-export const MODRINTH_HEADERS = { 'User-Agent': 'MCLogRef/1.0 (github.com/YisRime)' }
+export const MODRINTH_HEADERS = { 'User-Agent': 'MCLogRef/1.0 (github.com/GuideMC/MCLogRef)' }
 export const MODRINTH_LOADERS = ['fabric', 'forge', 'neoforge', 'quilt', 'liteloader', 'modloader', 'rift', 'risugami']
 
 export function truncate(text: string, limit: number = 8192): string {

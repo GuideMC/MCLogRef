@@ -2,6 +2,14 @@
   "name": "MCLogRef",
   "type": "module",
   "private": true,
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/GuideMC/MCLogRef.git"
+  },
+  "homepage": "https://github.com/GuideMC/MCLogRef#readme",
+  "bugs": {
+    "url": "https://github.com/GuideMC/MCLogRef/issues"
+  },
   "scripts": {
     "build": "nuxt build",
     "dev": "nuxt dev",
